@@ -110,12 +110,17 @@ describe('Calculator', () => {
       expect(calculator.add('//*\n1*2*3\n4*5')).toBe(15);
     });
 
-    test('should handle custom delimiters with zero and negative numbers', () => {
+    test('should handle custom delimiters with zero values', () => {
       expect(calculator.add('//;\n0;0')).toBe(0);
       expect(calculator.add('//|\n1|0|2')).toBe(3);
-      expect(calculator.add('//*\n-1*2')).toBe(1);
-      expect(calculator.add('//#\n1#-2#3')).toBe(2);
-      expect(calculator.add('//@\n-1@-2@-3')).toBe(-6);
+    });
+
+    test('should throw exception for negative numbers with custom delimiters', () => {
+      expect(() => calculator.add('//*\n-1*2')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('//#\n1#-2#3')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('//@\n-1@-2@-3')).toThrow('negatives not allowed - -1, -2, -3');
+      expect(() => calculator.add('//;\n-1;-2')).toThrow('negatives not allowed - -1, -2');
+      expect(() => calculator.add('//|\n1|-2|3')).toThrow('negatives not allowed - -2');
     });
 
     test('should handle custom delimiters with invalid numbers', () => {
@@ -142,18 +147,26 @@ describe('Calculator', () => {
       expect(calculator.add('0,0\n0')).toBe(0);
     });
 
-    test('should handle negative numbers', () => {
-      expect(calculator.add('-1')).toBe(-1);
-      expect(calculator.add('-1,2')).toBe(1);
-      expect(calculator.add('1,-2')).toBe(-1);
-      expect(calculator.add('-5,-3')).toBe(-8);
-      expect(calculator.add('1,-2,3')).toBe(2);
-      expect(calculator.add('-1,-2,-3')).toBe(-6);
-      expect(calculator.add('1,-2,3,-4')).toBe(-2);
-      expect(calculator.add('-1\n2')).toBe(1);
-      expect(calculator.add('1\n-2')).toBe(-1);
-      expect(calculator.add('-1\n-2\n-3')).toBe(-6);
-      expect(calculator.add('1,-2\n3')).toBe(2);
+    test('should throw exception for single negative number', () => {
+      expect(() => calculator.add('-1')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('-5')).toThrow('negatives not allowed - -5');
+      expect(() => calculator.add('-10')).toThrow('negatives not allowed - -10');
+    });
+
+    test('should throw exception for multiple negative numbers', () => {
+      expect(() => calculator.add('-1,2')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('1,-2')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('-5,-3')).toThrow('negatives not allowed - -5, -3');
+      expect(() => calculator.add('1,-2,3')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('-1,-2,-3')).toThrow('negatives not allowed - -1, -2, -3');
+      expect(() => calculator.add('1,-2,3,-4')).toThrow('negatives not allowed - -2, -4');
+    });
+
+    test('should throw exception for negative numbers with newlines', () => {
+      expect(() => calculator.add('-1\n2')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('1\n-2')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('-1\n-2\n-3')).toThrow('negatives not allowed - -1, -2, -3');
+      expect(() => calculator.add('1,-2\n3')).toThrow('negatives not allowed - -2');
     });
 
     test('should handle invalid number strings gracefully', () => {

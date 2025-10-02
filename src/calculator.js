@@ -20,6 +20,20 @@ class Calculator {
     // Split by delimiter and newline, then convert to numbers
     const numberArray = numberString.split(new RegExp(`[${delimiter}\n]+`));
     
+    // Check for negative numbers and collect them
+    const negatives = [];
+    for (const num of numberArray) {
+      const parsedNum = parseInt(num.trim());
+      if (!isNaN(parsedNum) && parsedNum < 0) {
+        negatives.push(parsedNum);
+      }
+    }
+    
+    // Throw exception if negative numbers found
+    if (negatives.length > 0) {
+      throw new Error(`negatives not allowed - ${negatives.join(', ')}`);
+    }
+    
     // Calculate sum of all numbers
     let sum = 0;
     for (const num of numberArray) {
