@@ -5,8 +5,8 @@ class Calculator {
       return 0;
     }
 
-    // Split by comma and convert to numbers
-    const numberArray = numbers.split(',');
+    // Split by comma and newline, then convert to numbers
+    const numberArray = numbers.split(/[,\n]+/);
     
     // Calculate sum of all numbers
     let sum = 0;

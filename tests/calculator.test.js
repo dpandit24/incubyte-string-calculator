@@ -57,6 +57,27 @@ describe('Calculator', () => {
       expect(calculator.add('  10  ,  20  ,  30  ')).toBe(60);
     });
 
+    test('should handle newlines as delimiters', () => {
+      expect(calculator.add('1\n2')).toBe(3);
+      expect(calculator.add('1\n2\n3')).toBe(6);
+      expect(calculator.add('1\n2,3')).toBe(6);
+      expect(calculator.add('1,2\n3')).toBe(6);
+      expect(calculator.add('1\n2\n3\n4')).toBe(10);
+    });
+
+    test('should handle mixed delimiters (commas and newlines)', () => {
+      expect(calculator.add('1,2\n3,4')).toBe(10);
+      expect(calculator.add('1\n2,3\n4')).toBe(10);
+      expect(calculator.add('1,2,3\n4,5')).toBe(15);
+      expect(calculator.add('1\n2\n3,4\n5')).toBe(15);
+    });
+
+    test('should handle newlines with spaces', () => {
+      expect(calculator.add('1 \n 2')).toBe(3);
+      expect(calculator.add(' 1 \n 2 \n 3 ')).toBe(6);
+      expect(calculator.add('1 , 2 \n 3 , 4 ')).toBe(10);
+    });
+
     test('should handle zero values', () => {
       expect(calculator.add('0')).toBe(0);
       expect(calculator.add('0,0')).toBe(0);
@@ -64,6 +85,9 @@ describe('Calculator', () => {
       expect(calculator.add('0,5')).toBe(5);
       expect(calculator.add('1,0,2')).toBe(3);
       expect(calculator.add('0,0,0')).toBe(0);
+      expect(calculator.add('0\n0')).toBe(0);
+      expect(calculator.add('1\n0\n2')).toBe(3);
+      expect(calculator.add('0,0\n0')).toBe(0);
     });
 
     test('should handle negative numbers', () => {
@@ -74,6 +98,10 @@ describe('Calculator', () => {
       expect(calculator.add('1,-2,3')).toBe(2);
       expect(calculator.add('-1,-2,-3')).toBe(-6);
       expect(calculator.add('1,-2,3,-4')).toBe(-2);
+      expect(calculator.add('-1\n2')).toBe(1);
+      expect(calculator.add('1\n-2')).toBe(-1);
+      expect(calculator.add('-1\n-2\n-3')).toBe(-6);
+      expect(calculator.add('1,-2\n3')).toBe(2);
     });
 
     test('should handle invalid number strings gracefully', () => {
@@ -84,6 +112,10 @@ describe('Calculator', () => {
       expect(calculator.add('1,abc,3')).toBe(4);
       expect(calculator.add('abc,2,def')).toBe(2);
       expect(calculator.add('1,abc,3,def')).toBe(4);
+      expect(calculator.add('1\nabc')).toBe(1);
+      expect(calculator.add('abc\n2')).toBe(2);
+      expect(calculator.add('1,abc\n3')).toBe(4);
+      expect(calculator.add('1\nabc,3')).toBe(4);
     });
   });
 });
