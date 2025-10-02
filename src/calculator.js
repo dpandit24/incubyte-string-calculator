@@ -8,19 +8,30 @@ class Calculator {
     let delimiter = ',';
     let numberString = numbers;
 
-    // Check for custom delimiter format: //[delimiter]\n[numbers...] or //[delimiter]\n[numbers...]
+    // Check for custom delimiter format: //[delimiter]\n[numbers...] or //[delim1][delim2]\n[numbers...]
     if (numbers.startsWith('//')) {
-      // Check for bracket format: //[delimiter]\n
-      const bracketMatch = numbers.match(/^\/\/\[(.+)\]\n/);
-      if (bracketMatch && bracketMatch[1] && bracketMatch[1].trim() !== '') {
-        delimiter = bracketMatch[1];
-        numberString = numbers.substring(bracketMatch[0].length);
+      // Check for multiple bracket format: //[delim1][delim2]\n
+      const multipleBracketMatch = numbers.match(/^\/\/(\[.+\])+\n/);
+      if (multipleBracketMatch) {
+        const delimiterMatches = numbers.match(/\[([^\]]+)\]/g);
+        if (delimiterMatches && delimiterMatches.length > 0) {
+          const delimiters = delimiterMatches.map(match => match.slice(1, -1)); // Remove [ and ]
+          delimiter = delimiters.join('|'); // Join with | for regex OR
+          numberString = numbers.substring(multipleBracketMatch[0].length);
+        }
       } else {
-        // Check for simple format: //delimiter\n
-        const delimiterMatch = numbers.match(/^\/\/(.+)\n/);
-        if (delimiterMatch && delimiterMatch[1] && delimiterMatch[1].trim() !== '') {
-          delimiter = delimiterMatch[1];
-          numberString = numbers.substring(delimiterMatch[0].length);
+        // Check for single bracket format: //[delimiter]\n
+        const bracketMatch = numbers.match(/^\/\/\[(.+)\]\n/);
+        if (bracketMatch && bracketMatch[1] && bracketMatch[1].trim() !== '') {
+          delimiter = bracketMatch[1];
+          numberString = numbers.substring(bracketMatch[0].length);
+        } else {
+          // Check for simple format: //delimiter\n
+          const delimiterMatch = numbers.match(/^\/\/(.+)\n/);
+          if (delimiterMatch && delimiterMatch[1] && delimiterMatch[1].trim() !== '') {
+            delimiter = delimiterMatch[1];
+            numberString = numbers.substring(delimiterMatch[0].length);
+          }
         }
       }
     }

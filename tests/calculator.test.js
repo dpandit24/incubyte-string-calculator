@@ -154,6 +154,62 @@ describe('Calculator', () => {
       expect(calculator.add('//[xyz]\n1xyzabcxyz3xyzdef')).toBe(4);
     });
 
+    test('should support multiple delimiters with bracket format', () => {
+      expect(calculator.add('//[*][%]\n1*2%3')).toBe(6);
+      expect(calculator.add('//[;][,]\n1;2,3')).toBe(6);
+      expect(calculator.add('//[abc][xyz]\n1abc2xyz3')).toBe(6);
+      expect(calculator.add('//[***][###]\n1***2###3')).toBe(6);
+      expect(calculator.add('//[*][%][#]\n1*2%3#4')).toBe(10);
+    });
+
+    test('should support multiple delimiters with different lengths', () => {
+      expect(calculator.add('//[*][abc]\n1*2abc3')).toBe(6);
+      expect(calculator.add('//[abc][*]\n1abc2*3')).toBe(6);
+      expect(calculator.add('//[***][xyz]\n1***2xyz3')).toBe(6);
+      expect(calculator.add('//[xyz][***]\n1xyz2***3')).toBe(6);
+      expect(calculator.add('//[a][bc][def]\n1a2bc3def4')).toBe(10);
+    });
+
+    test('should handle multiple delimiters with spaces', () => {
+      expect(calculator.add('//[*][%]\n1 * 2 % 3')).toBe(6);
+      expect(calculator.add('//[;][,]\n 1 ; 2 , 3 ')).toBe(6);
+      expect(calculator.add('//[abc][xyz]\n1 abc 2 xyz 3')).toBe(6);
+    });
+
+    test('should handle multiple delimiters with newlines in numbers', () => {
+      expect(calculator.add('//[*][%]\n1*2\n3')).toBe(6);
+      expect(calculator.add('//[;][,]\n1;2\n3,4')).toBe(10);
+      expect(calculator.add('//[abc][xyz]\n1abc2\n3xyz4')).toBe(10);
+    });
+
+    test('should handle multiple delimiters with zero and negative numbers', () => {
+      expect(calculator.add('//[*][%]\n0*0%0')).toBe(0);
+      expect(calculator.add('//[;][,]\n1;0,2')).toBe(3);
+      expect(() => calculator.add('//[*][%]\n-1*2%3')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('//[;][,]\n1;-2,3')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('//[abc][xyz]\n-1abc-2xyz-3')).toThrow('negatives not allowed - -1, -2, -3');
+    });
+
+    test('should handle multiple delimiters with numbers > 1000', () => {
+      expect(calculator.add('//[*][%]\n2*1001%3')).toBe(5);
+      expect(calculator.add('//[;][,]\n1;1001,3')).toBe(4);
+      expect(calculator.add('//[abc][xyz]\n1001abc1002xyz1003')).toBe(0);
+      expect(calculator.add('//[*][%]\n1000*1001%1002')).toBe(1000);
+    });
+
+    test('should handle multiple delimiters with invalid numbers', () => {
+      expect(calculator.add('//[*][%]\n1*abc%3')).toBe(4);
+      expect(calculator.add('//[;][,]\nabc;2,def')).toBe(2);
+      expect(calculator.add('//[abc][xyz]\n1abcdefxyz3xyzghi')).toBe(4);
+    });
+
+    test('should handle three or more delimiters', () => {
+      expect(calculator.add('//[*][%][#]\n1*2%3#4')).toBe(10);
+      expect(calculator.add('//[a][b][c][d]\n1a2b3c4d5')).toBe(15);
+      expect(calculator.add('//[;][,][|]\n1;2,3|4')).toBe(10);
+      expect(calculator.add('//[abc][xyz][del]\n1abc2xyz3del4')).toBe(10);
+    });
+
     test('should handle custom delimiters with spaces', () => {
       expect(calculator.add('//;\n1 ; 2')).toBe(3);
       expect(calculator.add('//|\n 1 | 2 | 3 ')).toBe(6);
