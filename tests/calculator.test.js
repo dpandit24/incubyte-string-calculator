@@ -44,11 +44,26 @@ describe('Calculator', () => {
       expect(calculator.add('  10  ,  20  ')).toBe(30);
     });
 
+    test('should return sum for multiple numbers', () => {
+      expect(calculator.add('1,2,3')).toBe(6);
+      expect(calculator.add('1,2,3,4')).toBe(10);
+      expect(calculator.add('1,2,3,4,5')).toBe(15);
+      expect(calculator.add('10,20,30,40')).toBe(100);
+    });
+
+    test('should return sum for multiple numbers with spaces', () => {
+      expect(calculator.add('1 , 2 , 3')).toBe(6);
+      expect(calculator.add(' 1 , 2 , 3 , 4 ')).toBe(10);
+      expect(calculator.add('  10  ,  20  ,  30  ')).toBe(60);
+    });
+
     test('should handle zero values', () => {
       expect(calculator.add('0')).toBe(0);
       expect(calculator.add('0,0')).toBe(0);
       expect(calculator.add('5,0')).toBe(5);
       expect(calculator.add('0,5')).toBe(5);
+      expect(calculator.add('1,0,2')).toBe(3);
+      expect(calculator.add('0,0,0')).toBe(0);
     });
 
     test('should handle negative numbers', () => {
@@ -56,12 +71,9 @@ describe('Calculator', () => {
       expect(calculator.add('-1,2')).toBe(1);
       expect(calculator.add('1,-2')).toBe(-1);
       expect(calculator.add('-5,-3')).toBe(-8);
-    });
-
-    test('should throw error for more than 2 numbers', () => {
-      expect(() => calculator.add('1,2,3')).toThrow('Maximum 2 numbers allowed');
-      expect(() => calculator.add('1,2,3,4')).toThrow('Maximum 2 numbers allowed');
-      expect(() => calculator.add('1,2,3,4,5')).toThrow('Maximum 2 numbers allowed');
+      expect(calculator.add('1,-2,3')).toBe(2);
+      expect(calculator.add('-1,-2,-3')).toBe(-6);
+      expect(calculator.add('1,-2,3,-4')).toBe(-2);
     });
 
     test('should handle invalid number strings gracefully', () => {
@@ -69,6 +81,9 @@ describe('Calculator', () => {
       expect(calculator.add('1,abc')).toBe(1);
       expect(calculator.add('abc,2')).toBe(2);
       expect(calculator.add('abc,def')).toBe(0);
+      expect(calculator.add('1,abc,3')).toBe(4);
+      expect(calculator.add('abc,2,def')).toBe(2);
+      expect(calculator.add('1,abc,3,def')).toBe(4);
     });
   });
 });
