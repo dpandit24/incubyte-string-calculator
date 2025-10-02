@@ -8,17 +8,27 @@ class Calculator {
     let delimiter = ',';
     let numberString = numbers;
 
-    // Check for custom delimiter format: //[delimiter]\n[numbers...]
+    // Check for custom delimiter format: //[delimiter]\n[numbers...] or //[delimiter]\n[numbers...]
     if (numbers.startsWith('//')) {
-      const delimiterMatch = numbers.match(/^\/\/(.+)\n/);
-      if (delimiterMatch && delimiterMatch[1] && delimiterMatch[1].trim() !== '') {
-        delimiter = delimiterMatch[1];
-        numberString = numbers.substring(delimiterMatch[0].length);
+      // Check for bracket format: //[delimiter]\n
+      const bracketMatch = numbers.match(/^\/\/\[(.+)\]\n/);
+      if (bracketMatch && bracketMatch[1] && bracketMatch[1].trim() !== '') {
+        delimiter = bracketMatch[1];
+        numberString = numbers.substring(bracketMatch[0].length);
+      } else {
+        // Check for simple format: //delimiter\n
+        const delimiterMatch = numbers.match(/^\/\/(.+)\n/);
+        if (delimiterMatch && delimiterMatch[1] && delimiterMatch[1].trim() !== '') {
+          delimiter = delimiterMatch[1];
+          numberString = numbers.substring(delimiterMatch[0].length);
+        }
       }
     }
 
     // Split by delimiter and newline, then convert to numbers
-    const numberArray = numberString.split(new RegExp(`[${delimiter}\n]+`));
+    // Escape special regex characters in delimiter
+    const escapedDelimiter = delimiter.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const numberArray = numberString.split(new RegExp(`[${escapedDelimiter}\n]+`));
     
     // Check for negative numbers and collect them
     const negatives = [];

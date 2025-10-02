@@ -98,6 +98,62 @@ describe('Calculator', () => {
       expect(calculator.add('//delim\n1delim2delim3')).toBe(6);
     });
 
+    test('should support delimiters of any length with bracket format', () => {
+      expect(calculator.add('//[***]\n1***2***3')).toBe(6);
+      expect(calculator.add('//[abc]\n1abc2abc3')).toBe(6);
+      expect(calculator.add('//[xyz]\n1xyz2xyz3')).toBe(6);
+      expect(calculator.add('//[delimiter]\n1delimiter2delimiter3')).toBe(6);
+      expect(calculator.add('//[***]\n1***2***3***4')).toBe(10);
+    });
+
+    test('should support very long delimiters with bracket format', () => {
+      expect(calculator.add('//[verylongdelimiter]\n1verylongdelimiter2verylongdelimiter3')).toBe(6);
+      expect(calculator.add('//[***]\n1***2***3')).toBe(6);
+      expect(calculator.add('//[@@@@]\n1@@@@2@@@@3')).toBe(6);
+      expect(calculator.add('//[del]\n1del2del3')).toBe(6);
+    });
+
+    test('should support special characters in bracket delimiters', () => {
+      expect(calculator.add('//[***]\n1***2***3')).toBe(6);
+      expect(calculator.add('//[###]\n1###2###3')).toBe(6);
+      expect(calculator.add('//[$$$]\n1$$$2$$$3')).toBe(6);
+      expect(calculator.add('//[---]\n1---2---3')).toBe(6);
+      expect(calculator.add('//[+++]\n1+++2+++3')).toBe(6);
+    });
+
+    test('should handle bracket delimiters with spaces', () => {
+      expect(calculator.add('//[***]\n1 *** 2 *** 3')).toBe(6);
+      expect(calculator.add('//[abc]\n 1 abc 2 abc 3 ')).toBe(6);
+      expect(calculator.add('//[xyz]\n1 xyz 2 xyz 3 xyz 4')).toBe(10);
+    });
+
+    test('should handle bracket delimiters with newlines in numbers', () => {
+      expect(calculator.add('//[***]\n1***2\n3')).toBe(6);
+      expect(calculator.add('//[abc]\n1abc2\n3abc4')).toBe(10);
+      expect(calculator.add('//[xyz]\n1xyz2xyz3\n4xyz5')).toBe(15);
+    });
+
+    test('should handle bracket delimiters with zero and negative numbers', () => {
+      expect(calculator.add('//[***]\n0***0')).toBe(0);
+      expect(calculator.add('//[abc]\n1abc0abc2')).toBe(3);
+      expect(() => calculator.add('//[***]\n-1***2')).toThrow('negatives not allowed - -1');
+      expect(() => calculator.add('//[abc]\n1abc-2abc3')).toThrow('negatives not allowed - -2');
+      expect(() => calculator.add('//[xyz]\n-1xyz-2xyz-3')).toThrow('negatives not allowed - -1, -2, -3');
+    });
+
+    test('should handle bracket delimiters with numbers > 1000', () => {
+      expect(calculator.add('//[***]\n2***1001')).toBe(2);
+      expect(calculator.add('//[abc]\n1abc1001abc3')).toBe(4);
+      expect(calculator.add('//[xyz]\n1001xyz1002xyz1003')).toBe(0);
+      expect(calculator.add('//[***]\n1000***1001')).toBe(1000);
+    });
+
+    test('should handle bracket delimiters with invalid numbers', () => {
+      expect(calculator.add('//[***]\n1***abc***3')).toBe(4);
+      expect(calculator.add('//[abc]\nabcabc2abcdef')).toBe(2);
+      expect(calculator.add('//[xyz]\n1xyzabcxyz3xyzdef')).toBe(4);
+    });
+
     test('should handle custom delimiters with spaces', () => {
       expect(calculator.add('//;\n1 ; 2')).toBe(3);
       expect(calculator.add('//|\n 1 | 2 | 3 ')).toBe(6);
