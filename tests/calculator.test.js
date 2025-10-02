@@ -78,6 +78,58 @@ describe('Calculator', () => {
       expect(calculator.add('1 , 2 \n 3 , 4 ')).toBe(10);
     });
 
+    test('should support custom delimiters with //[delimiter]\\n format', () => {
+      expect(calculator.add('//;\n1;2')).toBe(3);
+      expect(calculator.add('//;\n1;2;3')).toBe(6);
+      expect(calculator.add('//|\n1|2|3')).toBe(6);
+      expect(calculator.add('//*\n1*2*3')).toBe(6);
+      expect(calculator.add('//#\n1#2#3#4')).toBe(10);
+    });
+
+    test('should support custom delimiters with single character', () => {
+      expect(calculator.add('//@\n1@2')).toBe(3);
+      expect(calculator.add('//$\n1$2$3')).toBe(6);
+      expect(calculator.add('//%\n1%2%3%4')).toBe(10);
+    });
+
+    test('should support custom delimiters with multiple characters', () => {
+      expect(calculator.add('//abc\n1abc2')).toBe(3);
+      expect(calculator.add('//xyz\n1xyz2xyz3')).toBe(6);
+      expect(calculator.add('//delim\n1delim2delim3')).toBe(6);
+    });
+
+    test('should handle custom delimiters with spaces', () => {
+      expect(calculator.add('//;\n1 ; 2')).toBe(3);
+      expect(calculator.add('//|\n 1 | 2 | 3 ')).toBe(6);
+      expect(calculator.add('//*\n1 * 2 * 3 * 4')).toBe(10);
+    });
+
+    test('should handle custom delimiters with newlines in numbers', () => {
+      expect(calculator.add('//;\n1;2\n3')).toBe(6);
+      expect(calculator.add('//|\n1|2\n3|4')).toBe(10);
+      expect(calculator.add('//*\n1*2*3\n4*5')).toBe(15);
+    });
+
+    test('should handle custom delimiters with zero and negative numbers', () => {
+      expect(calculator.add('//;\n0;0')).toBe(0);
+      expect(calculator.add('//|\n1|0|2')).toBe(3);
+      expect(calculator.add('//*\n-1*2')).toBe(1);
+      expect(calculator.add('//#\n1#-2#3')).toBe(2);
+      expect(calculator.add('//@\n-1@-2@-3')).toBe(-6);
+    });
+
+    test('should handle custom delimiters with invalid numbers', () => {
+      expect(calculator.add('//;\n1;abc;3')).toBe(4);
+      expect(calculator.add('//|\nabc|2|def')).toBe(2);
+      expect(calculator.add('//*\n1*abc*3*def')).toBe(4);
+    });
+
+    test('should fallback to default delimiters when custom delimiter format is invalid', () => {
+      expect(calculator.add('//\n1,2')).toBe(3);
+      expect(calculator.add('//\n1,2,3')).toBe(6);
+      expect(calculator.add('//invalid\n1,2,3')).toBe(1);
+    });
+
     test('should handle zero values', () => {
       expect(calculator.add('0')).toBe(0);
       expect(calculator.add('0,0')).toBe(0);
