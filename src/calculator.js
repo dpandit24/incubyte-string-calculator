@@ -34,11 +34,11 @@ class Calculator {
       throw new Error(`negatives not allowed - ${negatives.join(', ')}`);
     }
     
-    // Calculate sum of all numbers
+    // Calculate sum of all numbers (ignore numbers > 1000)
     let sum = 0;
     for (const num of numberArray) {
       const parsedNum = parseInt(num.trim());
-      if (!isNaN(parsedNum)) {
+      if (!isNaN(parsedNum) && parsedNum <= 1000) {
         sum += parsedNum;
       }
     }

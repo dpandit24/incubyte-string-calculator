@@ -169,6 +169,39 @@ describe('Calculator', () => {
       expect(() => calculator.add('1,-2\n3')).toThrow('negatives not allowed - -2');
     });
 
+    test('should ignore numbers bigger than 1000', () => {
+      expect(calculator.add('2,1001')).toBe(2);
+      expect(calculator.add('1001,2')).toBe(2);
+      expect(calculator.add('1,1001,3')).toBe(4);
+      expect(calculator.add('1001,1002,1003')).toBe(0);
+      expect(calculator.add('1,1001,1002,3')).toBe(4);
+      expect(calculator.add('1000,1001')).toBe(1000);
+      expect(calculator.add('999,1000,1001')).toBe(1999);
+    });
+
+    test('should ignore numbers bigger than 1000 with newlines', () => {
+      expect(calculator.add('2\n1001')).toBe(2);
+      expect(calculator.add('1001\n2')).toBe(2);
+      expect(calculator.add('1\n1001\n3')).toBe(4);
+      expect(calculator.add('1,1001\n3')).toBe(4);
+      expect(calculator.add('1\n1001,3')).toBe(4);
+    });
+
+    test('should ignore numbers bigger than 1000 with custom delimiters', () => {
+      expect(calculator.add('//;\n2;1001')).toBe(2);
+      expect(calculator.add('//|\n1001|2')).toBe(2);
+      expect(calculator.add('//*\n1*1001*3')).toBe(4);
+      expect(calculator.add('//#\n1001#1002#1003')).toBe(0);
+      expect(calculator.add('//@\n1@1001@1002@3')).toBe(4);
+    });
+
+    test('should handle edge case of exactly 1000', () => {
+      expect(calculator.add('1000')).toBe(1000);
+      expect(calculator.add('999,1000')).toBe(1999);
+      expect(calculator.add('1000,1001')).toBe(1000);
+      expect(calculator.add('999,1000,1001')).toBe(1999);
+    });
+
     test('should handle invalid number strings gracefully', () => {
       expect(calculator.add('abc')).toBe(0);
       expect(calculator.add('1,abc')).toBe(1);
